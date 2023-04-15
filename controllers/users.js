@@ -4,7 +4,6 @@ const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .orFail()
     .then((newUser) => {
       res.send(newUser);
     })
