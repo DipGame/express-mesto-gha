@@ -20,7 +20,8 @@ app.use((req, res, next) => {
 app.use(router);
 
 app.patch('*', function(req, res){
-  res.json("ОШИБКА", 404);
+  res.send({ message: '¯\_(ツ)_/¯' }, 404)
+
 });
 
 app.listen(3000, () => {
