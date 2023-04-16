@@ -5,7 +5,7 @@ const createUser = (req, res) => {
 
   User.create({ name, about, avatar })
     .then((newUser) => {
-      res.send(newUser);
+      res.status(201).send(newUser);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -22,7 +22,7 @@ const getAllUser = (req, res) => {
       res.send(users);
     })
     .catch((err) => {
-      res.send(err);
+      res.status(500).send({ message: 'Что-то пошло не так...' })
     });
 };
 
@@ -36,8 +36,10 @@ const getUser = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные' });
-      } else {
+      } else if (err.name === 'DocumentNotFoundError') {
         res.status(404).send({ message: 'Пользователь не найден' });
+      } else {
+        res.status(500).send({ message: 'Что-то пошло не так...' })
       }
     });
 };

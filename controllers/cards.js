@@ -1,14 +1,12 @@
 const Card = require('../models/card');
 
 const createCard = (req, res) => {
-  const { id } = req.user;
   const { name, link } = req.body;
 
   Card.create({
     name,
     link,
-    owner: id,
-    likes: [],
+    owner: req.user
   })
     .then((newCard) => {
       res.send(newCard);
@@ -33,10 +31,9 @@ const getAllCards = (req, res) => {
 };
 
 const putLikesCard = (req, res) => {
-  const { id } = req.user;
   const { cardId } = req.params;
 
-  Card.updateOne({ _id: cardId }, { $addToSet: { likes: id } })
+  Card.findByIdAndUpdate({ _id: cardId }, { $addToSet: { likes: req.user } }, { new: true })
     .orFail()
     .then((like) => {
       res.send(like);
@@ -54,7 +51,7 @@ const deleteLikesCard = (req, res) => {
   const { id } = req.user;
   const { cardId } = req.params;
 
-  Card.updateOne({ _id: cardId }, { $pull: { likes: id } })
+  Card.findByIdAndUpdate({ _id: cardId }, { $pull: { likes: id } }, { new: true })
     .orFail()
     .then((like) => {
       res.send(like);
