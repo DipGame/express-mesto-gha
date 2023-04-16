@@ -1,4 +1,5 @@
 const Card = require('../models/card');
+const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVERE_ERROR, CREATED } = require('../errors/errors');
 
 const createCard = (req, res) => {
   const { name, link } = req.body;
@@ -9,13 +10,13 @@ const createCard = (req, res) => {
     owner: req.user
   })
     .then((newCard) => {
-      res.send(newCard);
+      res.status(CREATED).send(newCard);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Проверьте правильность введенных данных' })
+        res.status(BAD_REQUEST).send({ message: 'Проверьте правильность введенных данных' })
       } else {
-        res.status(500).send({ message: 'Что-то пошло не так...' })
+        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' })
       }
     });
 };
@@ -40,9 +41,9 @@ const putLikesCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Проверьте правильность введенных данных' });
+        res.status(BAD_REQUEST).send({ message: 'Проверьте правильность введенных данных' });
       } else {
-        res.status(404).send({ message: 'Что-то пошло не так...' });
+        res.status(NOT_FOUND).send({ message: 'Что-то пошло не так...' });
       }
     });
 };
@@ -58,9 +59,9 @@ const deleteLikesCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Проверьте правильность введенных данных' });
+        res.status(BAD_REQUEST).send({ message: 'Проверьте правильность введенных данных' });
       } else {
-        res.status(404).send({ message: 'Что-то пошло не так...' });
+        res.status(NOT_FOUND).send({ message: 'Что-то пошло не так...' });
       }
     });
 };
@@ -74,9 +75,9 @@ const deleteCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Проверьте правильность введенных данных' });
+        res.status(BAD_REQUEST).send({ message: 'Проверьте правильность введенных данных' });
       } else {
-        res.status(404).send({ message: 'Что-то пошло не так...' });
+        res.status(NOT_FOUND).send({ message: 'Что-то пошло не так...' });
       }
     });
 };
