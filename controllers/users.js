@@ -8,10 +8,10 @@ const createUser = (req, res) => {
       res.send(newUser);
     })
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Карточка или пользователь не найден' });
-      } else if (err.name === 'CastError') {
+      if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные в методы создания карточки, пользователя, обновления аватара пользователя или профиля' });
+      } else if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Что-то пошло не так...' });
       } else {
         res.status(500).send({ message: 'Что-то пошло не так...' });
       }
@@ -22,16 +22,18 @@ const patchUser = (req, res) => {
   const { id } = req.user;
   const { name, about } = req.body;
 
-  User.updateOne({ _id: id }, { $set: { name, about } })
-    .orFail()
-    .then((updateUser) => {
-      res.send(updateUser);
+  User.findByIdAndUpdate(id, { name, about })
+    .then(() => {
+      User.findById(id)
+        .then((user) => {
+          res.send(user);
+        });
     })
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Карточка или пользователь не найден' });
-      } else if (err.name === 'CastError') {
+      if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные в методы создания карточки, пользователя, обновления аватара пользователя или профиля' });
+      } else if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Что-то пошло не так...' });
       } else {
         res.status(500).send({ message: 'Что-то пошло не так...' });
       }
@@ -71,7 +73,7 @@ const getUser = (req, res) => {
       } else if (err.name === 'CastError') {
         res.status(400).send({ message: 'Переданы некорректные данные в методы создания карточки, пользователя, обновления аватара пользователя или профиля' });
       } else {
-        res.status(500).send({ message: 'Что-то пошло не так...' });
+        res.status(404).send({ message: 'Что-то пошло не так...' });
       }
     });
 };
