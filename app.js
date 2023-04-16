@@ -19,7 +19,7 @@ app.use((req, res, next) => {
 
 app.use(router);
 
-app.get('*', function(req, res){
+app.patch('*', function(req, res){
   res.json("ОШИБКА", 404);
 });
 

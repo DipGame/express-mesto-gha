@@ -69,8 +69,8 @@ const deleteLikesCard = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
-  const { id } = req.params;
-  Card.findByIdAndDelete(id)
+  const { cardId } = req.params;
+  Card.findByIdAndDelete(cardId)
     .orFail()
     .then((cards) => {
       res.send(cards);
