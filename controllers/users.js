@@ -8,55 +8,21 @@ const createUser = (req, res) => {
       res.send(newUser);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные в методы создания карточки, пользователя, обновления аватара пользователя или профиля' });
-      } else if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Что-то пошло не так...' });
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Проверьте правильность введенных данных' })
       } else {
-        res.status(500).send({ message: 'Что-то пошло не так...' });
+        res.status(500).send({ message: 'Что-то пошло не так...' })
       }
     });
 };
 
-const patchUser = (req, res) => {
-  const { id } = req.user;
-  const { name, about } = req.body;
-
-  User.findByIdAndUpdate(id, { name, about })
-    .then(() => {
-      User.findById(id)
-        .then((user) => {
-          res.send(user);
-        });
+const getAllUser = (req, res) => {
+  User.find()
+    .then((users) => {
+      res.send(users);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные в методы создания карточки, пользователя, обновления аватара пользователя или профиля' });
-      } else if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Что-то пошло не так...' });
-      } else {
-        res.status(500).send({ message: 'Что-то пошло не так...' });
-      }
-    });
-};
-
-const patchAvatar = (req, res) => {
-  const { id } = req.user;
-  const { avatar } = req.body;
-
-  User.updateOne({ _id: id }, { $set: { avatar } })
-    .orFail()
-    .then((updateUser) => {
-      res.send(updateUser);
-    })
-    .catch((err) => {
-      if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Карточка или пользователь не найден' });
-      } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные в методы создания карточки, пользователя, обновления аватара пользователя или профиля' });
-      } else {
-        res.status(500).send({ message: 'Что-то пошло не так...' });
-      }
+      res.send(err);
     });
 };
 
@@ -68,27 +34,46 @@ const getUser = (req, res) => {
       res.send(user);
     })
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Карточка или пользователь не найден' });
-      } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные в методы создания карточки, пользователя, обновления аватара пользователя или профиля' });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Переданы некорректные данные' });
       } else {
-        res.status(404).send({ message: 'Что-то пошло не так...' });
+        res.status(404).send({ message: 'Пользователь не найден' });
       }
     });
 };
 
-const getAllUser = (req, res) => {
-  User.find()
+const patchUser = (req, res) => {
+  const { id } = req.user;
+  const { name, about } = req.body;
+
+  User.findByIdAndUpdate(id, { name, about }, { new: true, runValidators: true })
     .orFail()
-    .then((users) => {
-      res.send(users);
+    .then(() => {
+      User.findById(id)
+        .then((user) => {
+          res.send(user);
+        });
     })
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Карточка или пользователь не найден' });
-      } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные в методы создания карточки, пользователя, обновления аватара пользователя или профиля' });
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Проверьте правильность введенных данных' });
+      } else {
+        res.status(500).send({ message: 'Что-то пошло не так...' });
+      }
+    });
+};
+
+const patchAvatar = (req, res) => {
+  const { id } = req.user;
+  const { avatar } = req.body;
+
+  User.findByIdAndUpdate(id, { avatar }, { new: true, runValidators: true })
+    .then((updateUser) => {
+      res.send(updateUser);
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Проверьте правильность введенных данных' });
       } else {
         res.status(500).send({ message: 'Что-то пошло не так...' });
       }
