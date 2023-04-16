@@ -10,18 +10,25 @@ const createCard = (req, res) => {
     owner: id,
     likes: [],
   })
-    .orFail()
     .then((newCard) => {
       res.send(newCard);
     })
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Карточка или пользователь не найден' });
-      } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные в методы создания карточки, пользователя, обновления аватара пользователя или профиля' });
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Проверьте правильность введенных данных' })
       } else {
-        res.status(500).send({ message: 'Что-то пошло не так...' });
+        res.status(500).send({ message: 'Что-то пошло не так...' })
       }
+    });
+};
+
+const getAllCards = (req, res) => {
+  Card.find()
+    .then((cards) => {
+      res.send(cards);
+    })
+    .catch((err) => {
+      res.send(err);
     });
 };
 
@@ -35,12 +42,10 @@ const putLikesCard = (req, res) => {
       res.send(like);
     })
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Карточка или пользователь не найден' });
-      } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные в методы создания карточки, пользователя, обновления аватара пользователя или профиля' });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Проверьте правильность введенных данных' });
       } else {
-        res.status(500).send({ message: 'Что-то пошло не так...' });
+        res.status(404).send({ message: 'Что-то пошло не так...' });
       }
     });
 };
@@ -55,29 +60,10 @@ const deleteLikesCard = (req, res) => {
       res.send(like);
     })
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Карточка или пользователь не найден' });
-      } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные в методы создания карточки, пользователя, обновления аватара пользователя или профиля' });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Проверьте правильность введенных данных' });
       } else {
-        res.status(500).send({ message: 'Что-то пошло не так...' });
-      }
-    });
-};
-
-const getAllCards = (req, res) => {
-  Card.find()
-    .orFail()
-    .then((cards) => {
-      res.send(cards);
-    })
-    .catch((err) => {
-      if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Карточка или пользователь не найден' });
-      } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные в методы создания карточки, пользователя, обновления аватара пользователя или профиля' });
-      } else {
-        res.status(500).send({ message: 'Что-то пошло не так...' });
+        res.status(404).send({ message: 'Что-то пошло не так...' });
       }
     });
 };
@@ -90,12 +76,10 @@ const deleteCard = (req, res) => {
       res.send(cards);
     })
     .catch((err) => {
-      if (err.message === 'NotFound') {
-        res.status(404).send({ message: 'Карточка или пользователь не найден' });
-      } else if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Переданы некорректные данные в методы создания карточки, пользователя, обновления аватара пользователя или профиля' });
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Проверьте правильность введенных данных' });
       } else {
-        res.status(500).send({ message: 'Что-то пошло не так...' });
+        res.status(404).send({ message: 'Что-то пошло не так...' });
       }
     });
 };

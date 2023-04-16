@@ -19,6 +19,10 @@ app.use((req, res, next) => {
 
 app.use(router);
 
+app.get('*', function(req, res){
+  res.json("ОШИБКА", 404);
+});
+
 app.listen(3000, () => {
   console.log('start server');
 });
