@@ -1,14 +1,11 @@
 const Card = require('../models/card');
+
 const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVERE_ERROR, CREATED } = require('../errors/errors');
 
 const createCard = (req, res) => {
-  const { name, link } = req.body;
+  const { name, link, ownerId } = req.body;
 
-  Card.create({
-    name,
-    link,
-    owner: req.user
-  })
+  Card.create({ name, link, ownerId })
     .then((newCard) => {
       res.status(CREATED).send(newCard);
     })
@@ -27,7 +24,7 @@ const getAllCards = (req, res) => {
       res.send(cards);
     })
     .catch((err) => {
-      res.send(err);
+      res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' })
     });
 };
 
@@ -76,8 +73,10 @@ const deleteCard = (req, res) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(BAD_REQUEST).send({ message: 'Проверьте правильность введенных данных' });
+      } else if (err.name === 'DocumentNotFoundError') {
+        res.status(NOT_FOUND).send({ message: 'Карточка не найдена' });
       } else {
-        res.status(NOT_FOUND).send({ message: 'Что-то пошло не так...' });
+        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' })
       }
     });
 };
