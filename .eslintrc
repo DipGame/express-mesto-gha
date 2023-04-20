@@ -1,4 +1,4 @@
 {
-  "extends": "airbnb-base",
-  "allow": "true"
+  "root": true,
+  "extends": "airbnb-base"
 }

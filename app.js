@@ -2,6 +2,9 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const mongoose = require('mongoose');
 const router = require('./routes');
+const {
+  NOT_FOUND,
+} = require('./errors/errors');
 
 const app = express();
 
@@ -12,19 +15,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   req.user = {
-    id: '643aeae7efe2e22414bfa1ff',
-    name: 'ndsa',
-    about: 'чsda',
-    avatar: 'htttp//:ddddsffads.ru'
+    id: '64391e727819e0011e1c84c9',
   };
   next();
 });
 
 app.use(router);
 
-app.patch('*', function(req, res){
-  res.send({ message: '¯\_(ツ)_/¯' }, 404)
-
+app.patch('*', (req, res) => {
+  res.send({ message: 'Что то не так...' }, NOT_FOUND);
 });
 
 app.listen(3000, () => {

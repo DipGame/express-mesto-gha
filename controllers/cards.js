@@ -1,37 +1,43 @@
+/* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 const Card = require('../models/card');
 
-const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVERE_ERROR, CREATED } = require('../errors/errors');
+const {
+  BAD_REQUEST, NOT_FOUND, INTERNAL_SERVERE_ERROR, CREATED,
+} = require('../errors/errors');
 
 const createCard = (req, res) => {
-  const { name, link, ownerId } = req.body;
+  const { id } = req.user;
+  const { name, link } = req.body;
 
-  Card.create({ name, link, ownerId })
+  Card.create({ name, link, owner: id })
     .then((newCard) => {
       res.status(CREATED).send(newCard);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Проверьте правильность введенных данных' })
+        res.status(BAD_REQUEST).send({ message: 'Проверьте правильность введенных данных' });
       } else {
-        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' })
+        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
       }
     });
 };
 
 const getAllCards = (req, res) => {
   Card.find()
+    .populate(['owner', 'likes'])
     .then((cards) => {
       res.send(cards);
     })
-    .catch((err) => {
-      res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' })
+    .catch(() => {
+      res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
     });
 };
 
 const putLikesCard = (req, res) => {
+  const { id } = req.user;
   const { cardId } = req.params;
 
-  Card.findByIdAndUpdate({ _id: cardId }, { $addToSet: { likes: req.user } }, { new: true })
+  Card.findByIdAndUpdate({ _id: cardId }, { $addToSet: { likes: id } }, { new: true })
     .orFail()
     .then((like) => {
       res.send(like);
@@ -76,7 +82,7 @@ const deleteCard = (req, res) => {
       } else if (err.name === 'DocumentNotFoundError') {
         res.status(NOT_FOUND).send({ message: 'Карточка не найдена' });
       } else {
-        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' })
+        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
       }
     });
 };
