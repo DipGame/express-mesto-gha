@@ -42,12 +42,8 @@ const putLikesCard = (req, res) => {
     .then((like) => {
       res.send(like);
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Проверьте правильность введенных данных' });
-      } else {
-        res.status(NOT_FOUND).send({ message: 'Что-то пошло не так...' });
-      }
+    .catch(() => {
+      res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
     });
 };
 

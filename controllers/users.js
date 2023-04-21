@@ -1,5 +1,7 @@
 const User = require('../models/user');
-const { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVERE_ERROR, CREATED } = require('../errors/errors');
+const {
+  BAD_REQUEST, NOT_FOUND, INTERNAL_SERVERE_ERROR, CREATED,
+} = require('../errors/errors');
 
 const createUser = (req, res) => {
   const { name, about, avatar } = req.body;
@@ -10,9 +12,9 @@ const createUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Проверьте правильность введенных данных' })
+        res.status(BAD_REQUEST).send({ message: 'Проверьте правильность введенных данных' });
       } else {
-        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' })
+        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
       }
     });
 };
@@ -22,8 +24,8 @@ const getAllUser = (req, res) => {
     .then((users) => {
       res.send(users);
     })
-    .catch((err) => {
-      res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' })
+    .catch(() => {
+      res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
     });
 };
 
@@ -40,7 +42,7 @@ const getUser = (req, res) => {
       } else if (err.name === 'DocumentNotFoundError') {
         res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
       } else {
-        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' })
+        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
       }
     });
 };

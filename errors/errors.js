@@ -7,5 +7,5 @@ module.exports = {
   BAD_REQUEST,
   NOT_FOUND,
   INTERNAL_SERVERE_ERROR,
-  CREATED
+  CREATED,
 };
