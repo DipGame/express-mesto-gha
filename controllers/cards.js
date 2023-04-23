@@ -43,7 +43,13 @@ const putLikesCard = (req, res) => {
       res.send(like);
     })
     .catch(() => {
-      res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
+      } else if (err.name === 'DocumentNotFoundError') {
+        res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
+      } else {
+        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
+      }
     });
 };
 
@@ -58,9 +64,11 @@ const deleteLikesCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Проверьте правильность введенных данных' });
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
+      } else if (err.name === 'DocumentNotFoundError') {
+        res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
       } else {
-        res.status(NOT_FOUND).send({ message: 'Что-то пошло не так...' });
+        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
       }
     });
 };
