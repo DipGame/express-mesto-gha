@@ -42,7 +42,7 @@ const putLikesCard = (req, res) => {
     .then((like) => {
       res.send(like);
     })
-    .catch(() => {
+    .catch((err) => {
       if (err.name === 'CastError') {
         res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
       } else if (err.name === 'DocumentNotFoundError') {

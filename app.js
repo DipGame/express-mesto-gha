@@ -27,5 +27,6 @@ app.patch('*', (req, res) => {
 });
 
 app.listen(3000, () => {
+  // eslint-disable-next-line no-console
   console.log('start server');
 });
