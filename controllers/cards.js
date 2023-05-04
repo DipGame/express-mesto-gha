@@ -1,4 +1,3 @@
-/* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 const Card = require('../models/card');
 
 const {
