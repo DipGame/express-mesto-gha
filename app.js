@@ -16,10 +16,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(router);
 
-app.patch('*', (res) => {
+app.patch('*', (req, res) => {
   const error = new Error('Что то не так...');
   error.statusCode = NOT_FOUND;
-  res.send({ message: error.message }, error.statusCode);
+  res.status(error.statusCode).send({ message: error.message });
 });
 
 app.use(errors());
