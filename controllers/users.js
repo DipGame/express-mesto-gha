@@ -107,9 +107,7 @@ const getMe = (req, res) => {
       res.send(user);
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданdы некорректные данные' });
-      } else if (err.name === 'DocumentNotFoundError') {
+      if (err.name === 'DocumentNotFoundError') {
         res.status(NOT_FOUND).send({ message: 'Пользоватdель не найден' });
       } else {
         res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
@@ -129,12 +127,8 @@ const patchUser = (req, res) => {
           res.send(user);
         });
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Проверьте правильность введенных данных' });
-      } else {
-        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
-      }
+    .catch(() => {
+      res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
     });
 };
 
@@ -146,12 +140,8 @@ const patchAvatar = (req, res) => {
     .then((updateUser) => {
       res.send(updateUser);
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(BAD_REQUEST).send({ message: 'Проверьте правильность введенных данных' });
-      } else {
-        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
-      }
+    .catch(() => {
+      res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
     });
 };
 

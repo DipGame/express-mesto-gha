@@ -78,6 +78,11 @@ const deleteCard = (req, res) => {
 
   Card.findById(cardId)
     .then((card) => {
+      if (!card) {
+        res.status(NOT_FOUND).send({ message: 'Карточка не найдена' });
+        // eslint-disable-next-line no-useless-return
+        return;
+      }
       const isEqual = card.owner.equals(id);
       if (isEqual) {
         Card.findByIdAndDelete(cardId)

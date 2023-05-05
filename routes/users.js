@@ -23,10 +23,6 @@ userRouter.post(
   '/signin',
   celebrate({
     body: Joi.object().keys({
-      name: Joi.string().min(2).max(30),
-      about: Joi.string().min(2).max(30),
-      // eslint-disable-next-line no-useless-escape
-      avatar: Joi.string().min(2).pattern(/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/),
       email: Joi.string().required().email(),
       password: Joi.string().required().min(8),
     }),
@@ -39,7 +35,7 @@ userRouter.get(
   '/users/:id',
   celebrate({
     params: Joi.object().keys({
-      id: Joi.string().min(24),
+      id: Joi.string().required().hex().length(24),
     }),
   }),
   getUser,
@@ -49,7 +45,7 @@ userRouter.patch(
   celebrate({
     body: Joi.object().keys({
       // eslint-disable-next-line no-useless-escape
-      avatar: Joi.string().min(2).pattern(/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/),
+      avatar: Joi.string().required().min(2).pattern(/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/),
     }),
   }),
   patchAvatar,
@@ -58,8 +54,8 @@ userRouter.patch(
   '/users/me',
   celebrate({
     body: Joi.object().keys({
-      name: Joi.string().min(2).max(30),
-      about: Joi.string().min(2).max(30),
+      name: Joi.string().required().min(2).max(30),
+      about: Joi.string().required().min(2).max(30),
     }),
   }),
   patchUser,
