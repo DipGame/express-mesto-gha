@@ -97,7 +97,10 @@ const deleteCard = (req, res) => {
       } else {
         res.status(403).send({ message: 'Эта не ваша карточка' });
       }
-    });
+    })
+    .catch((err) => {
+      res.send({ message: 'не не не' });
+    })
 };
 
 module.exports = {
