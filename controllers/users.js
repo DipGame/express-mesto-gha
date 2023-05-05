@@ -11,7 +11,9 @@ const {
 } = require('../errors/errors');
 
 const createUser = async (req, res) => {
-  const { email, password } = req.body;
+  const {
+    email, password, name, about, avatar,
+  } = req.body;
 
   try {
     const user = await User.findOne({ email });
@@ -23,7 +25,9 @@ const createUser = async (req, res) => {
     }
 
     const hash = await bcrypt.hash(password, 10);
-    const newUser = await User.create({ email, password: hash });
+    const newUser = await User.create({
+      email, password: hash, name, about, avatar,
+    });
 
     res.status(200).send({ message: `Пользователь ${newUser.email} успешно зарегистрирован` });
   } catch (error) {
@@ -38,7 +42,7 @@ const createUser = async (req, res) => {
 const login = (req, res) => {
   const { email, password } = req.body;
 
-  User.findOne({ email }).select('+password')
+  User.findOne({ email })
     .then((user) => {
       if (!user) {
         res.status(400).send({ message: 'Пароль или Email неверные' });
