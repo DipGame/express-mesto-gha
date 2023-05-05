@@ -29,7 +29,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(router);
 
 app.patch('*', (req, res) => {
-  res.send({ message: 'Что то не так...' }, NOT_FOUND);
+  res.status(NOT_FOUND).send({ message: 'Что то не так...' });
 });
 
 app.use(errors());

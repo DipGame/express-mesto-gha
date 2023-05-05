@@ -33,16 +33,20 @@ userRouter.post(
 );
 userRouter.use('/users', Auth);
 userRouter.get('/users/me', getMe);
-userRouter.get('/users/:id', getUser);
+userRouter.get(
+  '/users/:id',
+  celebrate({
+    params: Joi.object().keys({
+      id: Joi.string().min(24),
+    }),
+  }),
+  getUser,
+);
 userRouter.patch(
   '/users/me/avatar',
   celebrate({
     body: Joi.object().keys({
-      name: Joi.string().min(2).max(30),
-      about: Joi.string().min(2).max(30),
       avatar: Joi.string().min(2).pattern(/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/),
-      email: Joi.string().required().email(),
-      password: Joi.string().required().min(8),
     }),
   }),
   patchAvatar,
@@ -53,9 +57,6 @@ userRouter.patch(
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
-      avatar: Joi.string().min(2).pattern(/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/),
-      email: Joi.string().required().email(),
-      password: Joi.string().required().min(8),
     }),
   }),
   patchUser,

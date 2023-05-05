@@ -81,6 +81,7 @@ const getAllUser = (req, res) => {
 
 const getUser = (req, res) => {
   const { id } = req.params;
+  console.log(req.params);
 
   User.findById(id)
     .orFail()
@@ -119,6 +120,7 @@ const getMe = (req, res) => {
 
 const patchUser = (req, res) => {
   const id = req.user._id;
+  console.log(id);
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(id, { name, about }, { new: true, runValidators: true })
