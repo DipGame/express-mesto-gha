@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
-    default: 'https://spblp.ru/wp-content/uploads/2020/06/ZHak-Iv-Kusto-1200x900.jpg?p=8048',
+    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
   email: {
     type: String,
@@ -31,6 +31,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     minlength: 8,
+    select: false,
   },
 });
 

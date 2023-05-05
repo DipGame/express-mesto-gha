@@ -5,7 +5,7 @@ const {
 } = require('../errors/errors');
 
 const createCard = (req, res) => {
-  const { id } = req.user;
+  const id = req.user._id;
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: id })
@@ -33,7 +33,7 @@ const getAllCards = (req, res) => {
 };
 
 const putLikesCard = (req, res) => {
-  const { id } = req.user;
+  const id = req.user._id;
   const { cardId } = req.params;
 
   Card.findByIdAndUpdate({ _id: cardId }, { $addToSet: { likes: id } }, { new: true })
@@ -53,7 +53,7 @@ const putLikesCard = (req, res) => {
 };
 
 const deleteLikesCard = (req, res) => {
-  const { id } = req.user;
+  const id = req.user._id;
   const { cardId } = req.params;
 
   Card.findByIdAndUpdate({ _id: cardId }, { $pull: { likes: id } }, { new: true })

@@ -3,6 +3,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const Auth = require('../middlewares/auth');
 
 const validator = require('validator');
 const User = require('../models/user');
@@ -33,7 +34,7 @@ const createUser = async (req, res) => {
       email, name, about, avatar,
     });
   } catch (error) {
-    if (error.statusCode === 401) {
+    if (error.statusCode === 409) {
       res.status(error.statusCode).send({ message: error.message });
     } else {
       res.status(400).send({ message: error.message });
@@ -44,7 +45,7 @@ const createUser = async (req, res) => {
 const login = (req, res) => {
   const { email, password } = req.body;
 
-  User.findOne({ email })
+  User.findOne({ email }.select('+password'))
     .then((user) => {
       if (!user) {
         res.status(401).send({ message: 'Пароль или Email неверные' });
@@ -78,25 +79,46 @@ const getAllUser = (req, res) => {
     });
 };
 
-const getUser = (req, res, next) => {
-  res.send(req.params.userId);
+const getUser = (req, res) => {
+  const { id } = req.params;
 
-  User.findById(req.params.userId)
+  User.findById(id)
     .orFail()
     .then((user) => {
       res.send(user);
     })
     .catch((err) => {
-      if (err instanceof BAD_REQUEST) {
-        next({ message: 'Переданы некорректные данные' });
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
+      } else if (err.name === 'DocumentNotFoundError') {
+        res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
       } else {
-        next(err);
+        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
+      }
+    });
+};
+
+const getMe = (req, res) => {
+  const id = req.user._id;
+
+  User.findById(id)
+    .orFail()
+    .then((user) => {
+      res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST).send({ message: 'Переданdы некорректные данные' });
+      } else if (err.name === 'DocumentNotFoundError') {
+        res.status(NOT_FOUND).send({ message: 'Пользоватdель не найден' });
+      } else {
+        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
       }
     });
 };
 
 const patchUser = (req, res) => {
-  const { id } = req.user;
+  const id = req.user._id;
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(id, { name, about }, { new: true, runValidators: true })
@@ -117,7 +139,7 @@ const patchUser = (req, res) => {
 };
 
 const patchAvatar = (req, res) => {
-  const { id } = req.user;
+  const id = req.user._id;
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(id, { avatar }, { new: true, runValidators: true })
@@ -140,4 +162,5 @@ module.exports = {
   patchUser,
   patchAvatar,
   login,
+  getMe,
 };
