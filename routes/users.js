@@ -5,7 +5,8 @@ const {
 } = require('../controllers/users');
 const Auth = require('../middlewares/auth');
 
-userRouter.post('/signup', celebrate({
+userRouter.post('/signup',
+celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
@@ -13,7 +14,8 @@ userRouter.post('/signup', celebrate({
     email: Joi.string().required().email(),
     password: Joi.string().required().min(8),
   }),
-}), createUser);
+}),
+ createUser);
 userRouter.post('/signin', login);
 userRouter.use('/users', Auth);
 userRouter.get('/users/:id', getUser);
