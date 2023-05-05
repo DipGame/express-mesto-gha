@@ -73,19 +73,29 @@ const deleteLikesCard = (req, res) => {
 };
 
 const deleteCard = (req, res) => {
+  const id = req.user._id;
   const { cardId } = req.params;
-  Card.findByIdAndDelete(cardId)
-    .orFail()
-    .then((cards) => {
-      res.send(cards);
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Проверьте правильность введенных данных' });
-      } else if (err.name === 'DocumentNotFoundError') {
-        res.status(NOT_FOUND).send({ message: 'Карточка не найдена' });
+
+  Card.findById(cardId)
+    .then((card) => {
+      const isEqual = card.owner.equals(id);
+      if (isEqual) {
+        Card.findByIdAndDelete(cardId)
+          .orFail()
+          .then((cards) => {
+            res.send(cards);
+          })
+          .catch((err) => {
+            if (err.name === 'CastError') {
+              res.status(BAD_REQUEST).send({ message: 'Проверьте правильность введенных данных' });
+            } else if (err.name === 'DocumentNotFoundError') {
+              res.status(NOT_FOUND).send({ message: 'Карточка не найдена' });
+            } else {
+              res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
+            }
+          });
       } else {
-        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
+        res.status(403).send({ message: 'Эта не ваша карточка' });
       }
     });
 };
