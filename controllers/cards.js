@@ -99,7 +99,7 @@ const deleteCard = (req, res) => {
       }
     })
     .catch((err) => {
-      res.send({ message: 'не не не' });
+      res.status(404).send({ message: 'не не не' });
     })
 };
 
