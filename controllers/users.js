@@ -45,7 +45,7 @@ const createUser = async (req, res) => {
 const login = (req, res) => {
   const { email, password } = req.body;
 
-  User.findOne({ email }.select('+password'))
+  User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
         res.status(401).send({ message: 'Пароль или Email неверные' });
