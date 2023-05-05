@@ -20,7 +20,7 @@ const createUser = async (req, res) => {
 
     if (user) {
       const error = new Error('Пользователь уже существует');
-      error.statusCode = 403;
+      error.statusCode = 409;
       throw error;
     }
 
@@ -29,7 +29,9 @@ const createUser = async (req, res) => {
       email, password: hash, name, about, avatar,
     });
 
-    res.status(200).send({ message: `Пользователь ${newUser.email} успешно зарегистрирован` });
+    res.status(200).send({
+      email, name, about, avatar,
+    });
   } catch (error) {
     if (error.statusCode === 401) {
       res.status(error.statusCode).send({ message: error.message });
@@ -45,7 +47,7 @@ const login = (req, res) => {
   User.findOne({ email })
     .then((user) => {
       if (!user) {
-        res.status(400).send({ message: 'Пароль или Email неверные' });
+        res.status(401).send({ message: 'Пароль или Email неверные' });
         // eslint-disable-next-line no-useless-return
         return;
       }
