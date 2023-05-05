@@ -3,12 +3,11 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const Auth = require('../middlewares/auth');
 
-const validator = require('validator');
 const User = require('../models/user');
 const {
-  BAD_REQUEST, NOT_FOUND, INTERNAL_SERVERE_ERROR, CREATED, UNAUTHORIZED,
+  // eslint-disable-next-line no-unused-vars
+  BAD_REQUEST, NOT_FOUND, INTERNAL_SERVERE_ERROR, CREATED, UNAUTHORIZED, CONFLICT, OK,
 } = require('../errors/errors');
 
 const createUser = async (req, res) => {
@@ -21,23 +20,24 @@ const createUser = async (req, res) => {
 
     if (user) {
       const error = new Error('Пользователь уже существует');
-      error.statusCode = 409;
+      error.statusCode = CONFLICT;
       throw error;
     }
 
     const hash = await bcrypt.hash(password, 10);
+    // eslint-disable-next-line no-unused-vars
     const newUser = await User.create({
       email, password: hash, name, about, avatar,
     });
 
-    res.status(200).send({
+    res.status(CREATED).send({
       email, name, about, avatar,
     });
   } catch (error) {
-    if (error.statusCode === 409) {
+    if (error.statusCode === CONFLICT) {
       res.status(error.statusCode).send({ message: error.message });
     } else {
-      res.status(400).send({ message: error.message });
+      res.status(BAD_REQUEST).send({ message: error.message });
     }
   }
 };
@@ -48,7 +48,7 @@ const login = (req, res) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        res.status(401).send({ message: 'Пароль или Email неверные' });
+        res.status(UNAUTHORIZED).send({ message: 'Пароль или Email неверные' });
         // eslint-disable-next-line no-useless-return
         return;
       }
@@ -56,16 +56,16 @@ const login = (req, res) => {
       bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            res.status(400).send({ message: 'Пароль или Email неверные' });
+            res.status(BAD_REQUEST).send({ message: 'Пароль или Email неверные' });
             // eslint-disable-next-line no-useless-return
             return;
           }
           const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
-          res.status(200).send({ token });
+          res.status(OK).send({ token });
         });
     })
     .catch((err) => {
-      res.status(400).send({ message: err.message });
+      res.status(BAD_REQUEST).send({ message: err.message });
     });
 };
 
@@ -81,7 +81,6 @@ const getAllUser = (req, res) => {
 
 const getUser = (req, res) => {
   const { id } = req.params;
-  console.log(req.params);
 
   User.findById(id)
     .orFail()
@@ -120,7 +119,6 @@ const getMe = (req, res) => {
 
 const patchUser = (req, res) => {
   const id = req.user._id;
-  console.log(id);
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(id, { name, about }, { new: true, runValidators: true })

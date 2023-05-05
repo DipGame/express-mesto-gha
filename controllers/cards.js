@@ -1,7 +1,7 @@
 const Card = require('../models/card');
 
 const {
-  BAD_REQUEST, NOT_FOUND, INTERNAL_SERVERE_ERROR, CREATED,
+  BAD_REQUEST, NOT_FOUND, INTERNAL_SERVERE_ERROR, CREATED, FORBIDDEN,
 } = require('../errors/errors');
 
 const createCard = (req, res) => {
@@ -95,12 +95,12 @@ const deleteCard = (req, res) => {
             }
           });
       } else {
-        res.status(403).send({ message: 'Эта не ваша карточка' });
+        res.status(FORBIDDEN).send({ message: 'Эта не ваша карточка' });
       }
     })
-    .catch((err) => {
-      res.status(404).send({ message: 'не не не' });
-    })
+    .catch(() => {
+      res.status(NOT_FOUND).send({ message: 'не не не' });
+    });
 };
 
 module.exports = {
