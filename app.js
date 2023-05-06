@@ -19,7 +19,7 @@ app.use(router);
 
 app.use('*', (req, res, next) => {
   const error = new NotFoundError('Страница не найдена');
-  res.status(NOT_FOUND).send({ message: error.message });
+  res.status(error.statusCode).send({ message: error.message });
   next();
 });
 
