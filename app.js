@@ -4,9 +4,6 @@ const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 const { NotFoundError } = require('./errors/errors');
 const router = require('./routes');
-const {
-  NOT_FOUND,
-} = require('./errors/errors');
 
 const app = express();
 

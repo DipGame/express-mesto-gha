@@ -121,8 +121,12 @@ const patchUser = (req, res) => {
           res.send(user);
         });
     })
-    .catch(() => {
-      res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
+      } else {
+        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
+      }
     });
 };
 
@@ -134,8 +138,12 @@ const patchAvatar = (req, res) => {
     .then((updateUser) => {
       res.send(updateUser);
     })
-    .catch(() => {
-      res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
+      } else {
+        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
+      }
     });
 };
 
