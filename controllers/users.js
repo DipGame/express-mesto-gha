@@ -1,12 +1,8 @@
-/* eslint-disable consistent-return */
-/* eslint-disable import/no-extraneous-dependencies */
-// eslint-disable-next-line import/no-extraneous-dependencies
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 const {
-  // eslint-disable-next-line no-unused-vars
   BAD_REQUEST, NOT_FOUND, INTERNAL_SERVERE_ERROR, CREATED, UNAUTHORIZED, CONFLICT, OK,
 } = require('../errors/errors');
 
@@ -25,7 +21,6 @@ const createUser = async (req, res) => {
     }
 
     const hash = await bcrypt.hash(password, 10);
-    // eslint-disable-next-line no-unused-vars
     const newUser = await User.create({
       email, password: hash, name, about, avatar,
     });
@@ -57,7 +52,6 @@ const login = (req, res) => {
         .then((matched) => {
           if (!matched) {
             res.status(BAD_REQUEST).send({ message: 'Пароль или Email неверные' });
-            // eslint-disable-next-line no-useless-return
             return;
           }
           const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });

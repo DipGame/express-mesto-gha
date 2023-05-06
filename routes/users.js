@@ -12,7 +12,7 @@ userRouter.post(
       name: Joi.string().min(2).max(30),
       about: Joi.string().min(2).max(30),
       // eslint-disable-next-line no-useless-escape
-      avatar: Joi.string().min(2).pattern(/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/),
+      avatar: Joi.string().pattern(/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/),
       email: Joi.string().required().email(),
       password: Joi.string().required().min(8),
     }),
@@ -45,7 +45,7 @@ userRouter.patch(
   celebrate({
     body: Joi.object().keys({
       // eslint-disable-next-line no-useless-escape
-      avatar: Joi.string().required().min(2).pattern(/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/),
+      avatar: Joi.string().required().pattern(/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/),
     }),
   }),
   patchAvatar,

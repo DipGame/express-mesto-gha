@@ -103,8 +103,12 @@ const deleteCard = (req, res) => {
         res.status(FORBIDDEN).send({ message: 'Эта не ваша карточка' });
       }
     })
-    .catch(() => {
-      res.status(NOT_FOUND).send({ message: 'не не не' });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(BAD_REQUEST).send({ message: 'Проверьте правильность введенных данных' });
+      } else {
+        res.status(NOT_FOUND).send({ message: 'Карточка не найдена' });
+      }
     });
 };
 
