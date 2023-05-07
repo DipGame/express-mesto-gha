@@ -3,64 +3,64 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 const {
-  BAD_REQUEST,
-  NOT_FOUND,
-  INTERNAL_SERVERE_ERROR,
-  CREATED,
-  UNAUTHORIZED,
-  CONFLICT,
-  OK,
+  BAD_REQUEST, NOT_FOUND, INTERNAL_SERVERE_ERROR, CREATED, UNAUTHORIZED, CONFLICT, OK,
 } = require('../errors/errors');
 
-const createUser = async (req, res, next) => {
+const createUser = async (req, res) => {
   const {
     email, password, name, about, avatar,
   } = req.body;
 
-  User.findOne({ email })
-    .then((user) => {
-      if (user) {
-        const error = new Error('Пользователь уже существует');
-        error.statusCode = CONFLICT;
-        throw error;
-      }
+  try {
+    const user = await User.findOne({ email });
 
-      const hash = bcrypt.hash(password, 10);
-      User.create({
-        email, password: hash, name, about, avatar,
-      });
+    if (user) {
+      const error = new Error('Пользователь уже существует');
+      error.statusCode = CONFLICT;
+      throw error;
+    }
 
-      res.status(CREATED).send({
-        email, name, about, avatar,
-      });
-    })
-    .catch(next);
+    const hash = await bcrypt.hash(password, 10);
+    User.create({
+      email, password: hash, name, about, avatar,
+    });
+
+    res.status(CREATED).send({
+      email, name, about, avatar,
+    });
+  } catch (error) {
+    if (error.statusCode === CONFLICT) {
+      res.status(error.statusCode).send({ message: error.message });
+    } else {
+      res.status(BAD_REQUEST).send({ message: error.message });
+    }
+  }
 };
 
-const login = (req, res, next) => {
+const login = (req, res) => {
   const { email, password } = req.body;
 
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        const error = new Error('Пользователь не найден');
-        error.statusCode = UNAUTHORIZED;
-        throw error;
+        res.status(UNAUTHORIZED).send({ message: 'Пароль или Email неверные' });
+        // eslint-disable-next-line no-useless-return
+        return;
       }
 
       bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            const error = new Error('Email или пароль не верны');
-            error.statusCode = BAD_REQUEST;
-            throw error;
+            res.status(BAD_REQUEST).send({ message: 'Пароль или Email неверные' });
+            return;
           }
           const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
           res.status(OK).send({ token });
-        })
-        .catch(next);
+        });
     })
-    .catch(next);
+    .catch((err) => {
+      res.status(BAD_REQUEST).send({ message: err.message });
+    });
 };
 
 const getAllUser = (req, res) => {
