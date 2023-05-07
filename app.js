@@ -15,23 +15,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(router);
 
 app.use('*', (req, res, next) => {
-  const error = new NotFoundError('Страница не найдена');
-  res.status(error.statusCode).send({ message: error.message });
-  next();
+  next(new NotFoundError('Страница не найдена'));
 });
 
-// app.use((err, req, res, next) => {
-//   class NotFoundError extends Error {
-//     constructor(message) {
-//       super(messgae);
-//       this.statusCode = 404;
-//     }
-//   }
-//   const { statusCode = 500, message } = err;
-//   res.status(statusCode).send({ message: statusCode === 500 ? 'Что-то пошло не так' : message });
-// });
-
 app.use(errors());
+
+app.use((err, req, res, next) => {
+  res.status(err.statusCode).send({ message: err.message });
+  next();
+});
 
 app.listen(3000, () => {
   // eslint-disable-next-line no-console
