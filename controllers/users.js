@@ -6,28 +6,6 @@ const {
   BAD_REQUEST, NOT_FOUND, INTERNAL_SERVERE_ERROR, CREATED, UNAUTHORIZED, CONFLICT, OK,
 } = require('../errors/errors');
 
-// const createUser = (req, res, next) => {
-//   const {
-//     email, password, name, about, avatar,
-//   } = req.body;
-//   User.findOne({ email })
-//     .then((user) => {
-//       if (!user) {
-
-//         User.create({
-//           email, password: bcrypt.hash(password, 10), name, about, avatar,
-//         })
-//         .then((user) => {
-//           res.status(CREATED).send(user)
-//         })
-//       }
-//       const error = new Error('Пользователь уже существует');
-//       error.statusCode = CONFLICT;
-//       throw error;
-//     })
-//     .catch(next);
-// }
-
 const createUser = async (req, res, next) => {
   const {
     email, password, name, about, avatar,
@@ -93,6 +71,11 @@ const getUser = (req, res, next) => {
 
   User.findById(id)
     .then((user) => {
+      if (!user) {
+        const error = new Error('Пользователь не найден');
+        error.statusCode = NOT_FOUND;
+        throw error;
+      }
       res.send(user);
     })
     .catch(next);
