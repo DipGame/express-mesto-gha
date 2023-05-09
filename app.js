@@ -21,7 +21,7 @@ app.use('*', (req, res, next) => {
 app.use(errors());
 
 app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
+  let { statusCode = 500, message } = err;
   if (err.errors) {
     statusCode = 409;
     message = err.message;

@@ -5,6 +5,9 @@
       "error", {
         "allow": [ "_id" ]
       }
+    ],
+    "no-const-assign": [
+      "error"
     ]
   },
   "extends": "airbnb-base"
