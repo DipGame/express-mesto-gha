@@ -3,10 +3,32 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 const {
-  BAD_REQUEST, NOT_FOUND, INTERNAL_SERVERE_ERROR, CREATED, UNAUTHORIZED, CONFLICT, OK, NotFoundError,
+  BAD_REQUEST, NOT_FOUND, INTERNAL_SERVERE_ERROR, CREATED, UNAUTHORIZED, CONFLICT, OK,
 } = require('../errors/errors');
 
-const createUser = async (req, res) => {
+// const createUser = (req, res, next) => {
+//   const {
+//     email, password, name, about, avatar,
+//   } = req.body;
+//   User.findOne({ email })
+//     .then((user) => {
+//       if (!user) {
+
+//         User.create({
+//           email, password: bcrypt.hash(password, 10), name, about, avatar,
+//         })
+//         .then((user) => {
+//           res.status(CREATED).send(user)
+//         })
+//       }
+//       const error = new Error('Пользователь уже существует');
+//       error.statusCode = CONFLICT;
+//       throw error;
+//     })
+//     .catch(next);
+// }
+
+const createUser = async (req, res, next) => {
   const {
     email, password, name, about, avatar,
   } = req.body;
@@ -29,9 +51,7 @@ const createUser = async (req, res) => {
       email, name, about, avatar,
     });
   } catch (err) {
-    const error = new Error('Проверьте правильность введенных данных');
-    error.statusCode = BAD_REQUEST;
-    throw error;
+    next(err);
   }
 };
 
@@ -47,7 +67,6 @@ const login = (req, res, next) => {
       }
       bcrypt.compare(password, user.password)
         .then((fff) => {
-          console.log(fff);
           if (!fff) {
             const error = new Error('Пароль или Email неверные');
             error.statusCode = UNAUTHORIZED;
@@ -61,7 +80,7 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
-const getAllUser = (req, res) => {
+const getAllUser = (req, res, next) => {
   User.find()
     .then((users) => {
       res.send(users);
@@ -69,7 +88,7 @@ const getAllUser = (req, res) => {
     .catch(next);
 };
 
-const getUser = (req, res) => {
+const getUser = (req, res, next) => {
   const { id } = req.params;
 
   User.findById(id)
@@ -79,7 +98,7 @@ const getUser = (req, res) => {
     .catch(next);
 };
 
-const getMe = (req, res) => {
+const getMe = (req, res, next) => {
   const id = req.user._id;
 
   User.findById(id)
@@ -89,7 +108,7 @@ const getMe = (req, res) => {
     .catch(next);
 };
 
-const patchUser = (req, res) => {
+const patchUser = (req, res, next) => {
   const id = req.user._id;
   const { name, about } = req.body;
 
@@ -104,7 +123,7 @@ const patchUser = (req, res) => {
     .catch(next);
 };
 
-const patchAvatar = (req, res) => {
+const patchAvatar = (req, res, next) => {
   const id = req.user._id;
   const { avatar } = req.body;
 
