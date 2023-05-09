@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 const {
-  BAD_REQUEST, NOT_FOUND, INTERNAL_SERVERE_ERROR, CREATED, UNAUTHORIZED, CONFLICT, OK,
+  BAD_REQUEST, NOT_FOUND, INTERNAL_SERVERE_ERROR, CREATED, UNAUTHORIZED, CONFLICT, OK, NotFoundError,
 } = require('../errors/errors');
 
 const createUser = async (req, res) => {
@@ -28,39 +28,37 @@ const createUser = async (req, res) => {
     res.status(CREATED).send({
       email, name, about, avatar,
     });
-  } catch (error) {
-    if (error.statusCode === CONFLICT) {
-      res.status(error.statusCode).send({ message: error.message });
-    } else {
-      res.status(BAD_REQUEST).send({ message: error.message });
-    }
+  } catch (err) {
+    const error = new Error('Проверьте правильность введенных данных');
+    error.statusCode = BAD_REQUEST;
+    throw error;
   }
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        res.status(UNAUTHORIZED).send({ message: 'Пароль или Email неверные' });
-        // eslint-disable-next-line no-useless-return
-        return;
+        const error = new Error('Пароль или Email неверные');
+        error.statusCode = UNAUTHORIZED;
+        throw error;
       }
-
       bcrypt.compare(password, user.password)
-        .then((matched) => {
-          if (!matched) {
-            res.status(BAD_REQUEST).send({ message: 'Пароль или Email неверные' });
-            return;
+        .then((fff) => {
+          console.log(fff);
+          if (!fff) {
+            const error = new Error('Пароль или Email неверные');
+            error.statusCode = UNAUTHORIZED;
+            throw error;
           }
           const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
           res.status(OK).send({ token });
-        });
+        })
+        .catch(next);
     })
-    .catch((err) => {
-      res.status(BAD_REQUEST).send({ message: err.message });
-    });
+    .catch(next);
 };
 
 const getAllUser = (req, res) => {
@@ -68,45 +66,27 @@ const getAllUser = (req, res) => {
     .then((users) => {
       res.send(users);
     })
-    .catch(() => {
-      res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
-    });
+    .catch(next);
 };
 
 const getUser = (req, res) => {
   const { id } = req.params;
 
   User.findById(id)
-    .orFail()
     .then((user) => {
       res.send(user);
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(BAD_REQUEST).send({ message: 'Переданы некорректные данные' });
-      } else if (err.name === 'DocumentNotFoundError') {
-        res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
-      } else {
-        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
-      }
-    });
+    .catch(next);
 };
 
 const getMe = (req, res) => {
   const id = req.user._id;
 
   User.findById(id)
-    .orFail()
     .then((user) => {
       res.send(user);
     })
-    .catch((err) => {
-      if (err.name === 'DocumentNotFoundError') {
-        res.status(NOT_FOUND).send({ message: 'Пользоватdель не найден' });
-      } else {
-        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
-      }
-    });
+    .catch(next);
 };
 
 const patchUser = (req, res) => {
@@ -114,20 +94,14 @@ const patchUser = (req, res) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(id, { name, about }, { new: true, runValidators: true })
-    .orFail()
     .then(() => {
       User.findById(id)
         .then((user) => {
           res.send(user);
-        });
+        })
+        .catch(next);
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
-      } else {
-        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
-      }
-    });
+    .catch(next);
 };
 
 const patchAvatar = (req, res) => {
@@ -138,13 +112,7 @@ const patchAvatar = (req, res) => {
     .then((updateUser) => {
       res.send(updateUser);
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(NOT_FOUND).send({ message: 'Пользователь не найден' });
-      } else {
-        res.status(INTERNAL_SERVERE_ERROR).send({ message: 'Что-то пошло не так...' });
-      }
-    });
+    .catch(next);
 };
 
 module.exports = {
