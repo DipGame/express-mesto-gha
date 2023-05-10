@@ -28,31 +28,6 @@ const createUser = (req, res, next) => {
     .catch(next);
 };
 
-// const createUser = async (req, res, next) => {
-//   const {
-//     email, password, name, about, avatar,
-//   } = req.body;
-
-//   try {
-//     const user = await User.findOne({ email });
-
-//     if (user) {
-//       next(new CustomError(CONFLICT, 'Пользователь уже существует'));
-//     }
-
-//     const hash = await bcrypt.hash(password, 10);
-//     User.create({
-//       email, password: hash, name, about, avatar,
-//     });
-
-//     res.status(CREATED).send({
-//       email, name, about, avatar,
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
 const login = (req, res, next) => {
   const { email, password } = req.body;
 
