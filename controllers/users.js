@@ -16,10 +16,14 @@ const createUser = (req, res, next) => {
       User.create({
         email, password: hash, name, about, avatar,
       })
-        .then((user) => {
-          res.status(CREATED).send(user);
+        .then(() => {
+          res.status(CREATED).send({
+            email, name, about, avatar,
+          });
         })
-        .catch(next);
+        .catch(() => {
+          next(new CustomError(CONFLICT, 'Пользователь уже существует'));
+        });
     })
     .catch(next);
 };

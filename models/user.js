@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const isEmail = require('validator/lib/isEmail');
 const { default: isURL } = require('validator/lib/isURL');
-const uniqueValidator = require('mongoose-unique-validator')
+// eslint-disable-next-line import/no-extraneous-dependencies
+const uniqueValidator = require('mongoose-unique-validator');
 
 const userSchema = new mongoose.Schema({
   name: {
