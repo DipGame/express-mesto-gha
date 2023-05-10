@@ -66,7 +66,9 @@ const getUser = (req, res, next) => {
   User.findById(id)
     .then((user) => {
       if (!user) {
-        next(new CustomError(NOT_FOUND, 'Пользователь не найден'));
+        const error = new Error('Пользователь не найден');
+        error.statusCode = NOT_FOUND;
+        throw error;
       }
       res.send(user);
     })
