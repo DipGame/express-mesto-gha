@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 const {
-  NOT_FOUND, CREATED, UNAUTHORIZED, CONFLICT, OK, CustomError,
+  NOT_FOUND, CREATED, UNAUTHORIZED, CONFLICT, OK, CustomError, BAD_REQUEST,
 } = require('../errors/errors');
 
 const createUser = (req, res, next) => {
@@ -21,8 +21,12 @@ const createUser = (req, res, next) => {
             email, name, about, avatar,
           });
         })
-        .catch(() => {
-          next(new CustomError(CONFLICT, 'Пользователь уже существует'));
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            next(new CustomError(BAD_REQUEST, 'Проверьте правильность введенных данных'));
+          } else {
+            next(new CustomError(CONFLICT, 'Пользователь уже существует'));
+          }
         });
     })
     .catch(next);
