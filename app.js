@@ -23,7 +23,7 @@ app.use(errors());
 app.use((err, req, res, next) => {
   let { statusCode = INTERNAL_SERVERE_ERROR, message } = err;
   if (err.statusCode) {
-    statusCode = CONFLICT;
+    statusCode = err.statusCode;
     message = err.message;
   }
   res
