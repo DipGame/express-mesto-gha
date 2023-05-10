@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/user');
 const {
-  NOT_FOUND, CREATED, UNAUTHORIZED, CONFLICT, OK,
+  NOT_FOUND, CREATED, UNAUTHORIZED, CONFLICT, OK, CustomError,
 } = require('../errors/errors');
 
 const createUser = async (req, res, next) => {
@@ -15,9 +15,7 @@ const createUser = async (req, res, next) => {
     const user = await User.findOne({ email });
 
     if (user) {
-      const error = new Error('Пользователь уже существует');
-      error.statusCode = CONFLICT;
-      throw error;
+      next(new CustomError(CONFLICT, 'Пользователь уже существует'));
     }
 
     const hash = await bcrypt.hash(password, 10);
@@ -39,16 +37,12 @@ const login = (req, res, next) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        const error = new Error('Пароль или Email неверные');
-        error.statusCode = UNAUTHORIZED;
-        throw error;
+        next(new CustomError(UNAUTHORIZED, 'Пароль или Email неверные'));
       }
       bcrypt.compare(password, user.password)
         .then((fff) => {
           if (!fff) {
-            const error = new Error('Пароль или Email неверные');
-            error.statusCode = UNAUTHORIZED;
-            throw error;
+            next(new CustomError(UNAUTHORIZED, 'Пароль или Email неверные'));
           }
           const token = jwt.sign({ _id: user._id }, 'super-strong-secret', { expiresIn: '7d' });
           res.status(OK).send({ token });
@@ -72,9 +66,7 @@ const getUser = (req, res, next) => {
   User.findById(id)
     .then((user) => {
       if (!user) {
-        const error = new Error('Пользователь не найден');
-        error.statusCode = NOT_FOUND;
-        throw error;
+        next(new CustomError(NOT_FOUND, 'Пользователь не найден'));
       }
       res.send(user);
     })
@@ -96,12 +88,8 @@ const patchUser = (req, res, next) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(id, { name, about }, { new: true, runValidators: true })
-    .then(() => {
-      User.findById(id)
-        .then((user) => {
-          res.send(user);
-        })
-        .catch(next);
+    .then((user) => {
+      res.send(user);
     })
     .catch(next);
 };

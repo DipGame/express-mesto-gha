@@ -7,10 +7,10 @@ const UNAUTHORIZED = 401;
 const CONFLICT = 409;
 const FORBIDDEN = 403;
 
-class NotFoundError extends Error {
-  constructor(message) {
+class CustomError extends Error {
+  constructor(statusCode, message) {
     super(message);
-    this.statusCode = 404;
+    this.statusCode = statusCode;
   }
 }
 
@@ -23,5 +23,5 @@ module.exports = {
   CONFLICT,
   OK,
   FORBIDDEN,
-  NotFoundError,
+  CustomError,
 };

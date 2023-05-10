@@ -1,7 +1,7 @@
 const Card = require('../models/card');
 
 const {
-  NOT_FOUND, CREATED, FORBIDDEN,
+  NOT_FOUND, CREATED, FORBIDDEN, CustomError,
 } = require('../errors/errors');
 
 const createCard = (req, res, next) => {
@@ -31,9 +31,7 @@ const putLikesCard = (req, res, next) => {
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        const error = new Error('Карточка не найдена');
-        error.statusCode = NOT_FOUND;
-        throw error;
+        next(new CustomError(NOT_FOUND, 'Карточка не найдена'));
       }
       Card.findByIdAndUpdate({ _id: cardId }, { $addToSet: { likes: id } }, { new: true })
         .orFail()
@@ -51,9 +49,7 @@ const deleteLikesCard = (req, res, next) => {
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        const error = new Error('Карточка не найдена');
-        error.statusCode = NOT_FOUND;
-        throw error;
+        next(new CustomError(NOT_FOUND, 'Карточка не найдена'));
       }
       Card.findByIdAndUpdate({ _id: cardId }, { $pull: { likes: id } }, { new: true })
         .orFail()
@@ -72,9 +68,7 @@ const deleteCard = (req, res, next) => {
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        const error = new Error('Карточка не найдена');
-        error.statusCode = NOT_FOUND;
-        throw error;
+        next(new CustomError(NOT_FOUND, 'Карточка не найдена'));
       }
       const isEqual = card.owner.equals(id);
       if (isEqual) {
@@ -85,9 +79,7 @@ const deleteCard = (req, res, next) => {
           })
           .catch(next);
       } else {
-        const error = new Error('Эта не ваша карточка');
-        error.statusCode = FORBIDDEN;
-        throw error;
+        next(new CustomError(FORBIDDEN, 'Эта карточка не ваша)'));
       }
     })
     .catch(next);

@@ -2,7 +2,7 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
-const { NotFoundError } = require('./errors/errors');
+const { CustomError, NOT_FOUND, INTERNAL_SERVERE_ERROR, CONFLICT } = require('./errors/errors');
 const router = require('./routes');
 
 const app = express();
@@ -15,21 +15,21 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(router);
 
 app.use('*', (req, res, next) => {
-  next(new NotFoundError('Страница не найдена'));
+  next(new CustomError(NOT_FOUND, 'Страница не найдена'));
 });
 
 app.use(errors());
 
 app.use((err, req, res, next) => {
-  let { statusCode = 500, message } = err;
-  if (err.errors) {
-    statusCode = 409;
+  let { statusCode = INTERNAL_SERVERE_ERROR, message } = err;
+  if (err.statusCode) {
+    statusCode = CONFLICT;
     message = err.message;
   }
   res
     .status(statusCode)
     .send({
-      message: statusCode === 500
+      message: statusCode === INTERNAL_SERVERE_ERROR
         ? 'На сервере произошла ошибка'
         : message,
     });
