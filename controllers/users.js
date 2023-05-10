@@ -6,30 +6,48 @@ const {
   NOT_FOUND, CREATED, UNAUTHORIZED, CONFLICT, OK, CustomError,
 } = require('../errors/errors');
 
-const createUser = async (req, res, next) => {
+const createUser = (req, res, next) => {
   const {
     email, password, name, about, avatar,
   } = req.body;
 
-  try {
-    const user = await User.findOne({ email });
-
-    if (user) {
-      next(new CustomError(CONFLICT, 'Пользователь уже существует'));
-    }
-
-    const hash = await bcrypt.hash(password, 10);
-    User.create({
-      email, password: hash, name, about, avatar,
-    });
-
-    res.status(CREATED).send({
-      email, name, about, avatar,
-    });
-  } catch (err) {
-    next(err);
-  }
+  bcrypt.hash(password, 10)
+    .then((hash) => {
+      User.create({
+        email, password: hash, name, about, avatar,
+      })
+        .then((user) => {
+          res.status(CREATED).send(user);
+        })
+        .catch(next);
+    })
+    .catch(next);
 };
+
+// const createUser = async (req, res, next) => {
+//   const {
+//     email, password, name, about, avatar,
+//   } = req.body;
+
+//   try {
+//     const user = await User.findOne({ email });
+
+//     if (user) {
+//       next(new CustomError(CONFLICT, 'Пользователь уже существует'));
+//     }
+
+//     const hash = await bcrypt.hash(password, 10);
+//     User.create({
+//       email, password: hash, name, about, avatar,
+//     });
+
+//     res.status(CREATED).send({
+//       email, name, about, avatar,
+//     });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
 
 const login = (req, res, next) => {
   const { email, password } = req.body;

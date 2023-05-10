@@ -2,7 +2,7 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
-const { CustomError, NOT_FOUND, INTERNAL_SERVERE_ERROR, CONFLICT } = require('./errors/errors');
+const { CustomError, NOT_FOUND, INTERNAL_SERVERE_ERROR } = require('./errors/errors');
 const router = require('./routes');
 
 const app = express();
