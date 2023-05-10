@@ -35,6 +35,7 @@ const login = (req, res, next) => {
     .then((user) => {
       if (!user) {
         next(new CustomError(UNAUTHORIZED, 'Пароль или Email неверные'));
+        return;
       }
       bcrypt.compare(password, user.password)
         .then((fff) => {
@@ -63,9 +64,8 @@ const getUser = (req, res, next) => {
   User.findById(id)
     .then((user) => {
       if (!user) {
-        const error = new Error('Пользователь не найден');
-        error.statusCode = NOT_FOUND;
-        throw error;
+        next(new CustomError(NOT_FOUND, 'Пользователь не найден'));
+        return;
       }
       res.send(user);
     })
