@@ -22,6 +22,7 @@ const createUser = (req, res, next) => {
           });
         })
         .catch((err) => {
+          console.log(err.errors.email);
           if (err.errors.email.kind === 'unique') {
             next(new CustomError(CONFLICT, 'Пользователь уже существует'));
           } else {
